@@ -2,7 +2,9 @@
 
 A rotating 3D **ASCII cube** that wears a logo on every face — rendered as a fine dot-matrix of text characters, right in the browser. No libraries, no build step, no dependencies. Just open the HTML file.
 
-<!-- Tip: drop a screenshot or GIF here, e.g. ![preview](preview.png) -->
+<p align="center"><img src="assets/cute-mascot.png" width="120" alt="cute mascot logo"></p>
+
+<!-- Tip: a screenshot or GIF of the spinning cube would look great here too. -->
 
 ## Files
 
@@ -29,6 +31,10 @@ A rotating 3D **ASCII cube** that wears a logo on every face — rendered as a f
 - Logos are rasterized to an offscreen canvas — vector marks via `Path2D`, raster images via the image itself — then sampled into the cube. Color logos keep their original colors; flat marks use a single brand color.
 
 Pure HTML + CSS + vanilla JavaScript (Canvas 2D for logo rasterization). Runs offline.
+
+## Source assets
+
+The logo art lives in [`assets/`](assets/) (`claude.svg`, `openai.svg`, `cute-mascot.png`). Note that `index.html` already embeds these inline, so they're included here as references — you don't need them to run the cube.
 
 ## Note on logos
 
