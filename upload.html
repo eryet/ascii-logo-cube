@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ASCII Logo Cube — Upload</title>
+  <style>
+    :root {
+      --bg: #ece9e1;
+      --dot: #555;
+      --logo: #888;
+      --text: #4a4a44;
+      --muted: #8a857a;
+      --panel: #e1ddd0;
+      --border: #cfc8b6;
+    }
+
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Cascadia Code", "SFMono-Regular", Menlo, Consolas, monospace;
+      overflow: hidden;
+      transition: background .35s ease, color .35s ease;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      user-select: none;
+    }
+
+    pre#screen {
+      margin: 0;
+      line-height: 1.0;
+      font-size: 5px;
+      letter-spacing: 0.4em;
+      white-space: pre;
+      font-weight: 400;
+      transform: scale(1);
+      transform-origin: center center;
+      touch-action: none;
+    }
+
+    pre#screen .d {
+      color: var(--dot);
+    }
+
+    pre#screen .l {
+      color: var(--logo);
+    }
+
+    #ui {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn,
+    .seg button,
+    .sz {
+      font: inherit;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .btn {
+      background: var(--logo);
+      color: var(--bg);
+      font-weight: 700;
+      border: 0;
+      border-radius: 8px;
+      padding: 7px 16px;
+      cursor: pointer;
+      transition: background .2s ease;
+    }
+
+    .swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      background: var(--logo);
+      border: 1px solid var(--border);
+      display: inline-block;
+    }
+
+    .seg {
+      display: inline-flex;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .seg button {
+      cursor: pointer;
+      background: transparent;
+      color: var(--muted);
+      border: 0;
+      border-radius: 7px;
+      padding: 5px 12px;
+      transition: all .2s ease;
+    }
+
+    .seg button.on {
+      background: var(--logo);
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    .sz {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
+    }
+
+    .sz input[type=range] {
+      width: 130px;
+      accent-color: var(--logo);
+      cursor: pointer;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .3px;
+    }
+
+    .hint b {
+      color: var(--text);
+    }
+
+    kbd {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      padding: 1px 6px;
+      color: var(--text);
+      font-size: 11px;
+      margin: 0 1px;
+    }
+
+    /* drop overlay */
+    #drop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: color-mix(in srgb, var(--bg) 72%, transparent);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    #drop.show {
+      display: flex;
+    }
+
+    #drop .box {
+      border: 2px dashed var(--logo);
+      border-radius: 16px;
+      padding: 40px 60px;
+      font-size: 16px;
+      color: var(--text);
+      background: var(--panel);
+    }
+
+    #prompt {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+      pointer-events: none;
+      transition: opacity .3s ease;
+    }
+
+    #prompt.hide {
+      opacity: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <pre id="screen" aria-label="rotating ascii logo cube"></pre>
+  <div id="prompt">drop a logo image anywhere<br><span style="opacity:.7">PNG · JPG · SVG · WebP</span></div>
+  <div id="drop">
+    <div class="box">release to load your logo</div>
+  </div>
+
+  <div id="ui">
+    <div class="row">
+      <label class="btn">Upload logo<input id="file" type="file" accept="image/*" hidden></label>
+      <span class="swatch" id="swatch" title="detected logo color"></span>
+      <div class="seg" id="theme">
+        <button data-th="auto" class="on">Auto</button>
+        <button data-th="light">Light</button>
+        <button data-th="dark">Dark</button>
+      </div>
+      <label class="sz">size <input id="size" type="range" min="0.5" max="2" step="0.01" value="2.5"></label>
+    </div>
+    <div class="hint">
+      <b>drag</b> to rotate &nbsp;&middot;&nbsp;
+      <kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd> rotate &nbsp;&middot;&nbsp;
+      <kbd>Space</kbd> auto-spin &nbsp;&middot;&nbsp; <kbd>R</kbd> reset
+    </div>
+  </div>
+  <script>
+    (() => {
+      "use strict";
+      const screenEl = document.getElementById('screen');
+
+      // ---- logo texture state (set from an uploaded image) ----
+      let TEXW = 1, TEXH = 1, MASK = new Uint8Array(1);
+      let LOGO_HALF_X = 0.7, LOGO_HALF_Y = 0.7;
+      let hasLogo = false;
+
+      const isLogo = (u, v) => {
+        if (!hasLogo) return false;
+        if (u < -LOGO_HALF_X || u > LOGO_HALF_X || v < -LOGO_HALF_Y || v > LOGO_HALF_Y) return false;
+        let tx = (u / LOGO_HALF_X + 1) * 0.5 * TEXW | 0;
+        let ty = (1 - v / LOGO_HALF_Y) * 0.5 * TEXH | 0;
+        if (tx < 0) tx = 0; else if (tx >= TEXW) tx = TEXW - 1;
+        if (ty < 0) ty = 0; else if (ty >= TEXH) ty = TEXH - 1;
+        return MASK[ty * TEXW + tx] === 1;
+      };
+
+      // ---- analyze an uploaded image: extract shape mask + dominant color ----
+      function analyzeImage(img) {
+        const S = 256;
+        const cnv = document.createElement('canvas');
+        cnv.width = S; cnv.height = S;
+        const ctx = cnv.getContext('2d');
+        ctx.clearRect(0, 0, S, S);
+        let iw = img.naturalWidth, ih = img.naturalHeight;
+        if (!iw || !ih) { iw = S; ih = S; }
+        const sc = Math.min(S / iw, S / ih);
+        const dw = iw * sc, dh = ih * sc;
+        ctx.drawImage(img, (S - dw) / 2, (S - dh) / 2, dw, dh);
+        const d = ctx.getImageData(0, 0, S, S).data;
+
+        const total = S * S;
+        let transCount = 0;
+        for (let i = 0; i < total; i++) if (d[i * 4 + 3] < 40) transCount++;
+        const hasAlpha = transCount > total * 0.12;
+
+        const corner = (x, y) => { const i = (y * S + x) * 4; return [d[i], d[i + 1], d[i + 2]]; };
+        let bg = [255, 255, 255];
+        if (!hasAlpha) {
+          const cs = [corner(2, 2), corner(S - 3, 2), corner(2, S - 3), corner(S - 3, S - 3)];
+          bg = [0, 1, 2].map(k => (cs[0][k] + cs[1][k] + cs[2][k] + cs[3][k]) / 4);
+        }
+        const isInk = (i) => {
+          const a = d[i * 4 + 3];
+          if (hasAlpha) return a > 60;
+          if (a < 60) return false;
+          const dr = d[i * 4] - bg[0], dg = d[i * 4 + 1] - bg[1], db = d[i * 4 + 2] - bg[2];
+          return (dr * dr + dg * dg + db * db) > 1500;
+        };
+
+        let minx = S, miny = S, maxx = 0, maxy = 0, count = 0;
+        let sr = 0, sg = 0, sb = 0, wr = 0, wg = 0, wb = 0, wsum = 0;
+        for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+          const i = y * S + x;
+          if (!isInk(i)) continue;
+          if (x < minx) minx = x; if (x > maxx) maxx = x;
+          if (y < miny) miny = y; if (y > maxy) maxy = y;
+          const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2];
+          sr += r; sg += g; sb += b; count++;
+          const w = (Math.max(r, g, b) - Math.min(r, g, b)) + 6; // weight colorful pixels
+          wr += r * w; wg += g * w; wb += b * w; wsum += w;
+        }
+        if (count === 0) return null;
+        const color = (wsum > 0 ? [wr / wsum, wg / wsum, wb / wsum] : [sr / count, sg / count, sb / count])
+          .map(c => Math.round(c));
+        const w = maxx - minx + 1, h = maxy - miny + 1;
+        const mask = new Uint8Array(w * h);
+        for (let y = 0; y < h; y++) for (let x = 0; x < w; x++)
+          mask[y * w + x] = isInk((y + miny) * S + (x + minx)) ? 1 : 0;
+        return { mask, w, h, color };
+      }
+
+      // ---- theming: tint the whole cube from the logo's color ----
+      const THEMES = {
+        light: { bg: '#ece9e1', text: '#4a4a44', muted: '#8a857a', panel: '#e1ddd0', border: '#cfc8b6' },
+        dark: { bg: '#0b0b0d', text: '#e6e6ea', muted: '#7a7a82', panel: '#1b1b1f', border: '#2c2c33' }
+      };
+      let curColor = [136, 136, 136];
+      let autoDark = false;
+      let themeMode = 'auto';
+
+      const clamp = (v) => v < 0 ? 0 : v > 255 ? 255 : v | 0;
+      function deriveDot([r, g, b], dark) {
+        // keep the logo's hue but push it to a contrasting brightness against the bg
+        const f = dark
+          ? [clamp(r * 0.45 + 110), clamp(g * 0.45 + 110), clamp(b * 0.45 + 110)]   // lighten on dark
+          : [clamp(r * 0.5), clamp(g * 0.5), clamp(b * 0.5)];          // darken on light
+        return `rgb(${f[0]}, ${f[1]}, ${f[2]})`;
+      }
+      function applyTheme() {
+        const dark = themeMode === 'auto' ? autoDark : themeMode === 'dark';
+        const t = dark ? THEMES.dark : THEMES.light;
+        const r = document.documentElement.style;
+        r.setProperty('--bg', t.bg); r.setProperty('--text', t.text);
+        r.setProperty('--muted', t.muted); r.setProperty('--panel', t.panel);
+        r.setProperty('--border', t.border);
+        r.setProperty('--logo', `rgb(${curColor[0]}, ${curColor[1]}, ${curColor[2]})`);
+        r.setProperty('--dot', deriveDot(curColor, dark));
+      }
+
+      function setLogoFromImage(img) {
+        let res;
+        try { res = analyzeImage(img); }
+        catch (err) { showPrompt("couldn't read that image (cross-origin) &mdash; save it and drop the file"); return; }
+        if (!res) { showPrompt("couldn't find a logo shape in that image &mdash; try another"); return; }
+        MASK = res.mask; TEXW = res.w; TEXH = res.h;
+        LOGO_HALF_X = 0.7; LOGO_HALF_Y = LOGO_HALF_X * TEXH / TEXW;
+        curColor = res.color;
+        const lum = 0.2126 * curColor[0] + 0.7152 * curColor[1] + 0.0722 * curColor[2];
+        autoDark = lum > 165;            // light logo -> dark background
+        hasLogo = true;
+        applyTheme();
+        document.getElementById('prompt').classList.add('hide');
+      }
+
+      // ---- file handling (raster + svg) ----
+      function svgToDataURL(text) {
+        if (!/<svg[^>]*\bwidth=/.test(text) || !/<svg[^>]*\bheight=/.test(text)) {
+          const m = text.match(/viewBox\s*=\s*["']([\d.\-eE\s]+)["']/);
+          if (m) {
+            const p = m[1].trim().split(/[\s,]+/).map(Number);
+            if (p.length === 4) text = text.replace(/<svg/, `<svg width="${p[2]}" height="${p[3]}"`);
+          }
+        }
+        return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(text);
+      }
+      function showPrompt(msg) {
+        const p = document.getElementById('prompt');
+        p.classList.remove('hide');
+        if (msg) p.innerHTML = msg;
+      }
+      function handleFile(file) {
+        if (!file) return;
+        if (!/^image\//.test(file.type) && !/\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(file.name)) {
+          showPrompt("that's not an image — drop a PNG, JPG, SVG or WebP"); return;
+        }
+        const isSvg = file.type === 'image/svg+xml' || /\.svg$/i.test(file.name);
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => setLogoFromImage(img);
+          img.onerror = () => showPrompt("couldn't load that file");
+          img.src = isSvg ? svgToDataURL(reader.result) : reader.result;
+        };
+        reader.onerror = () => showPrompt("couldn't read that file");
+        if (isSvg) reader.readAsText(file); else reader.readAsDataURL(file);
+      }
+      function handleURL(src) {
+        if (!src) return;
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => setLogoFromImage(img);
+        img.onerror = () => showPrompt("couldn't load that image &mdash; save it and drop the file instead");
+        img.src = src;
+      }
+
+      // ================= cube engine =================
+      const W = 168, H = 140;
+      const CX = W / 2, CY = H / 2;
+      const K1 = 105, K2 = 5, ASPECT = 1.0, STEP = 0.016;
+      const DOT = '.', LOGO = '#';
+      const out = new Array(W * H);
+      const colb = new Uint8Array(W * H);
+      const zbuf = new Float32Array(W * H);
+
+      const FACES = [
+        { p: (u, v) => [1, u, v], n: [1, 0, 0] },
+        { p: (u, v) => [-1, u, v], n: [-1, 0, 0] },
+        { p: (u, v) => [u, 1, v], n: [0, 1, 0] },
+        { p: (u, v) => [u, -1, v], n: [0, -1, 0] },
+        { p: (u, v) => [u, v, 1], n: [0, 0, 1] },
+        { p: (u, v) => [u, v, -1], n: [0, 0, -1] },
+      ];
+
+      let m;
+      const setIdentity = () => { m = [1, 0, 0, 0, 1, 0, 0, 0, 1]; };
+      const rotate = (pitch, yaw) => {
+        const cp = Math.cos(pitch), sp = Math.sin(pitch);
+        const cy = Math.cos(yaw), sy = Math.sin(yaw);
+        const R = [[cy, 0, sy], [sp * sy, cp, -sp * cy], [-cp * sy, sp, cp * cy]];
+        const n = new Array(9);
+        for (let i = 0; i < 3; i++)
+          for (let j = 0; j < 3; j++)
+            n[i * 3 + j] = R[i][0] * m[j] + R[i][1] * m[3 + j] + R[i][2] * m[6 + j];
+        m = n;
+      };
+      const ortho = () => {
+        let ax = m[0], ay = m[1], az = m[2];
+        let la = Math.hypot(ax, ay, az); ax /= la; ay /= la; az /= la;
+        let bx = m[3], by = m[4], bz = m[5];
+        const dp = bx * ax + by * ay + bz * az; bx -= dp * ax; by -= dp * ay; bz -= dp * az;
+        let lb = Math.hypot(bx, by, bz); bx /= lb; by /= lb; bz /= lb;
+        const cx = ay * bz - az * by, cy = az * bx - ax * bz, cz = ax * by - ay * bx;
+        m = [ax, ay, az, bx, by, bz, cx, cy, cz];
+      };
+      const resetView = () => { setIdentity(); rotate(-0.5, 0.6); };
+      resetView();
+
+      let vYaw = 0, vPitch = 0;
+      let auto = true, dragging = false, lastX = 0, lastY = 0;
+      const keys = new Set();
+      const FRICTION = 0.92, KEY_ACC = 0.004, AUTO_V = 0.010, DRAG_S = 0.007;
+
+      function render() {
+        out.fill(' ');
+        zbuf.fill(0);
+        for (const f of FACES) {
+          const nz = m[6] * f.n[0] + m[7] * f.n[1] + m[8] * f.n[2];
+          if (nz > 0) continue;
+          for (let u = -1; u <= 1; u += STEP) {
+            for (let v = -1; v <= 1; v += STEP) {
+              const p = f.p(u, v);
+              const px = p[0], py = p[1], pz = p[2];
+              const wx = m[0] * px + m[1] * py + m[2] * pz;
+              const wy = m[3] * px + m[4] * py + m[5] * pz;
+              const wz = m[6] * px + m[7] * py + m[8] * pz;
+              const ooz = 1 / (wz + K2);
+              const sx = (CX + K1 * ooz * wx + 0.5) | 0;
+              const sy = (CY - K1 * ooz * ASPECT * wy + 0.5) | 0;
+              if (sx < 0 || sx >= W || sy < 0 || sy >= H) continue;
+              const idx = sx + sy * W;
+              if (ooz > zbuf[idx]) {
+                zbuf[idx] = ooz;
+                const lg = isLogo(u, v);
+                out[idx] = lg ? LOGO : DOT;
+                colb[idx] = lg ? 2 : 1;
+              }
+            }
+          }
+        }
+        let s = '';
+        for (let row = 0; row < H; row++) {
+          const base = row * W;
+          let cur = -1, buf = '';
+          for (let col = 0; col < W; col++) {
+            const ch = out[base + col];
+            const flag = ch === ' ' ? 0 : colb[base + col];
+            if (flag !== cur) {
+              if (buf) s += cur === 2 ? '<span class="l">' + buf + '</span>'
+                : cur === 1 ? '<span class="d">' + buf + '</span>' : buf;
+              buf = ''; cur = flag;
+            }
+            buf += ch;
+          }
+          if (buf) s += cur === 2 ? '<span class="l">' + buf + '</span>'
+            : cur === 1 ? '<span class="d">' + buf + '</span>' : buf;
+          s += '\n';
+        }
+        screenEl.innerHTML = s;
+      }
+
+      function loop() {
+        if (!dragging) {
+          if (keys.has('ArrowLeft')) vYaw -= KEY_ACC;
+          if (keys.has('ArrowRight')) vYaw += KEY_ACC;
+          if (keys.has('ArrowUp')) vPitch -= KEY_ACC;
+          if (keys.has('ArrowDown')) vPitch += KEY_ACC;
+          rotate(vPitch, vYaw);
+          vYaw *= FRICTION; vPitch *= FRICTION;
+          if (auto && keys.size === 0 && Math.abs(vYaw) + Math.abs(vPitch) < AUTO_V) rotate(0, AUTO_V);
+        }
+        ortho();
+        render();
+        requestAnimationFrame(loop);
+      }
+
+      // ---- input ----
+      addEventListener('keydown', (e) => {
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) { keys.add(e.key); e.preventDefault(); }
+        else if (e.key === ' ') { auto = !auto; e.preventDefault(); }
+        else if (e.key === 'r' || e.key === 'R') { resetView(); vYaw = 0; vPitch = 0; }
+      });
+      addEventListener('keyup', (e) => keys.delete(e.key));
+      addEventListener('pointerdown', (e) => {
+        if (e.target && e.target.closest && e.target.closest('#ui')) return;
+        dragging = true; lastX = e.clientX; lastY = e.clientY;
+        vYaw = 0; vPitch = 0; document.body.style.cursor = 'grabbing';
+      });
+      addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - lastX, dy = e.clientY - lastY;
+        lastX = e.clientX; lastY = e.clientY;
+        rotate(dy * DRAG_S, dx * DRAG_S); vYaw = dx * DRAG_S; vPitch = dy * DRAG_S;
+      });
+      const endDrag = () => { dragging = false; document.body.style.cursor = 'grab'; };
+      addEventListener('pointerup', endDrag);
+      addEventListener('pointercancel', endDrag);
+
+      // ---- controls ----
+      const fileInput = document.getElementById('file');
+      fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+      document.getElementById('size').addEventListener('input', (e) => {
+        screenEl.style.transform = 'scale(' + e.target.value + ')';
+      });
+      document.getElementById('theme').addEventListener('click', (e) => {
+        const b = e.target.closest('button'); if (!b) return;
+        themeMode = b.dataset.th;
+        for (const x of document.querySelectorAll('#theme button')) x.classList.toggle('on', x === b);
+        applyTheme();
+      });
+
+      // ---- drag & drop anywhere ----
+      const drop = document.getElementById('drop');
+      let dragDepth = 0;
+      const stop = (e) => { e.preventDefault(); e.stopPropagation(); };
+      addEventListener('dragenter', (e) => { stop(e); dragDepth++; drop.classList.add('show'); }, false);
+      addEventListener('dragover', (e) => {
+        stop(e);
+        if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'; // required on Windows for the drop to fire
+      }, false);
+      addEventListener('dragleave', (e) => { stop(e); if (--dragDepth <= 0) drop.classList.remove('show'); }, false);
+      addEventListener('drop', (e) => {
+        stop(e); dragDepth = 0; drop.classList.remove('show');
+        const dt = e.dataTransfer;
+        if (!dt) { showPrompt("nothing to drop"); return; }
+        if (dt.files && dt.files.length) { handleFile(dt.files[0]); return; }
+        // image dragged from a web page: no file, just a URL
+        let src = (dt.getData('text/uri-list') || dt.getData('text/plain') || '').trim();
+        if (!src) {
+          const html = dt.getData('text/html');
+          const m = html && html.match(/<img[^>]+src=["']([^"']+)["']/i);
+          if (m) src = m[1];
+        }
+        if (src) handleURL(src);
+        else showPrompt("couldn't read that drop &mdash; try the Upload button");
+      }, false);
+
+      applyTheme();
+      loop();
+    })();
+  </script>
+</body>
+
+</html>
