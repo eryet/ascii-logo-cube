@@ -2,6 +2,8 @@
 
 A rotating 3D **ASCII cube** that wears a logo on every face — rendered as a fine dot-matrix of text characters, right in the browser. No libraries, no build step, no dependencies. Just open the HTML file.
 
+> **Inspired by** the rotating ASCII cube on the [GitHub Shop](https://thegithubshop.com/products/mona-drink-float) (the *Mona Drink Float* product). This is a from-scratch recreation of that effect — all the rendering math is original.
+
 <p align="center"><img src="assets/cute-mascot.png" width="120" alt="cute mascot logo"></p>
 
 <!-- Tip: a screenshot or GIF of the spinning cube would look great here too. -->
