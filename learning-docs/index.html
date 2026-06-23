@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3D Graphics — Learning Roadmap</title>
+  <style>
+    :root {
+      --bg: #EDE9DE;
+      --text: #5b5647;
+      --muted: #8c8676;
+      --accent: #d97757;
+      --accent-soft: hsl(14.8, 63.1%, 59.6%);
+      --panel: #f3efe5;
+      --panel-2: #e3ddcd;
+      --border: #d3ccb8;
+      --done: #6f8f63;
+      --code: #6d6040;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .mono {
+      font-family: "Cascadia Code", "SFMono-Regular", Menlo, Consolas, monospace;
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 48px 24px 96px;
+    }
+
+    /* ---------- header ---------- */
+    header { margin-bottom: 14px; }
+
+    .crumb {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+    .crumb a { color: var(--accent); text-decoration: none; }
+    .crumb a:hover { text-decoration: underline; }
+
+    h1 {
+      font-size: 34px;
+      line-height: 1.15;
+      margin: 0 0 10px;
+      letter-spacing: -0.5px;
+    }
+    h1 .ac { color: var(--accent); }
+
+    .lede {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 0 28px;
+    }
+
+    /* ---------- progress ---------- */
+    .progress-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 44px;
+    }
+    .bar {
+      flex: 1;
+      height: 10px;
+      background: var(--panel-2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar > i {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-soft), var(--done));
+      border-radius: 99px;
+      transition: width .4s ease;
+    }
+    .pct { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 15px; min-width: 116px; }
+    .pct small { color: var(--muted); font-weight: 400; }
+    .reset {
+      font: inherit;
+      font-size: 12px;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 11px;
+      cursor: pointer;
+      transition: all .15s ease;
+      white-space: nowrap;
+    }
+    .reset:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ---------- stages ---------- */
+    .stage { margin-bottom: 40px; }
+    .stage-head {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 4px;
+    }
+    .stage-num {
+      font-family: "Cascadia Code", monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--bg);
+      background: var(--accent);
+      width: 30px; height: 30px;
+      flex: 0 0 30px;
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      transform: translateY(4px);
+    }
+    .stage-title { font-size: 21px; margin: 0; }
+    .stage-sub { color: var(--muted); font-size: 14px; margin: 2px 0 16px 44px; }
+
+    .cards { display: grid; gap: 12px; margin-left: 44px; }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 15px 17px;
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      gap: 14px;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .card:hover { border-color: var(--accent-soft); box-shadow: 0 4px 18px rgba(0,0,0,.05); }
+
+    .chk {
+      appearance: none;
+      width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 3px;
+      position: relative;
+      transition: all .15s ease;
+      flex: 0 0 20px;
+    }
+    .chk:hover { border-color: var(--done); }
+    .chk:checked { background: var(--done); border-color: var(--done); }
+    .chk:checked::after {
+      content: "";
+      position: absolute;
+      left: 6px; top: 2px;
+      width: 5px; height: 10px;
+      border: solid #fff;
+      border-width: 0 2.5px 2.5px 0;
+      transform: rotate(45deg);
+    }
+
+    .card-body .name {
+      font-weight: 600;
+      font-size: 15.5px;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .card-body .name:hover { color: var(--accent); }
+    .card-body .name::after { content: " ↗"; font-size: 12px; color: var(--muted); }
+    .card.done .card-body .name { color: var(--muted); text-decoration: line-through; }
+
+    .note { font-size: 13.5px; color: var(--muted); margin: 3px 0 9px; }
+
+    .tags { display: flex; gap: 7px; flex-wrap: wrap; }
+    .tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 99px;
+      letter-spacing: .2px;
+    }
+    .t-type { background: #e7e0ea; color: #7e72a0; }
+    .t-read { background: #e2e9dd; color: #5f7d52; }
+    .t-int  { background: #fae2d8; color: #c45f3d; }
+    .t-vid  { background: #fde4e4; color: #b85c5c; }
+    .t-code { background: var(--panel-2); color: var(--code); }
+    .lvl-beg { background: #dfeede; color: #4f7a45; }
+    .lvl-int { background: #f3ead6; color: #a07d36; }
+    .lvl-adv { background: #f6ddd9; color: #b14d3d; }
+
+    /* ---------- algorithm map ---------- */
+    .section-title {
+      font-size: 22px;
+      margin: 56px 0 6px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title::before {
+      content: "";
+      width: 30px; height: 4px;
+      background: var(--accent);
+      border-radius: 99px;
+    }
+    .section-lede { color: var(--muted); font-size: 14px; margin: 0 0 22px; }
+
+    .algo-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 14px;
+    }
+    .algo-table th, .algo-table td {
+      text-align: left;
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .algo-table th {
+      background: var(--panel-2);
+      font-size: 12px;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .algo-table tr:last-child td { border-bottom: 0; }
+    .algo-table td.algo { font-weight: 600; white-space: nowrap; }
+    .algo-table .lines {
+      font-family: "Cascadia Code", monospace;
+      font-size: 12.5px;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .algo-table a { color: var(--accent); text-decoration: none; }
+    .algo-table a:hover { text-decoration: underline; }
+
+    /* ---------- reference chips ---------- */
+    .refs { display: flex; flex-wrap: wrap; gap: 9px; }
+    .ref {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 8px 13px;
+      font-size: 13px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all .15s ease;
+    }
+    .ref:hover { border-color: var(--accent); color: var(--accent); }
+
+    footer {
+      margin-top: 64px;
+      padding-top: 22px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 560px) {
+      .cards, .stage-sub { margin-left: 0; }
+      .progress-card { flex-wrap: wrap; }
+      .algo-table .lines { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="crumb"><a href="../index.html">← back to the cube</a> &nbsp;·&nbsp; learning-docs</div>
+      <h1>3D Graphics — <span class="ac">a learning roadmap</span></h1>
+      <p class="lede">
+        From the ASCII cube you already have, to reading a full GPU solar-system renderer.
+        Four stages, ordered so each one makes the next readable. Tick things off as you go —
+        your progress saves automatically in this browser.
+      </p>
+    </header>
+
+    <div class="progress-card">
+      <div class="pct"><span id="pctNum">0%</span> <small>· <span id="pctCount">0 / 0</span></small></div>
+      <div class="bar"><i id="barFill"></i></div>
+      <button class="reset" id="resetBtn">Reset progress</button>
+    </div>
+
+    <div id="stages"></div>
+
+    <h2 class="section-title">Concepts inside <span class="mono">&nbsp;index.html</span></h2>
+    <p class="section-lede">
+      Every algorithm your cube uses, where it lives in the code, and the best place to learn it.
+      Open <code>../index.html</code> at those line numbers while you read.
+    </p>
+    <table class="algo-table">
+      <thead>
+        <tr><th>Algorithm</th><th>Lines</th><th>What it does</th><th>Learn it</th></tr>
+      </thead>
+      <tbody id="algoBody"></tbody>
+    </table>
+
+    <h2 class="section-title">Quick reference</h2>
+    <p class="section-lede">One-page explainers — good for looking up a single term.</p>
+    <div class="refs" id="refs"></div>
+
+    <footer>
+      Built for the <a href="../index.html">ascii-logo-cube</a> project.
+      Progress is stored locally in your browser (nothing leaves your machine).
+    </footer>
+  </div>
+
+  <script>
+    // ---------------- data ----------------
+    const STAGES = [
+      {
+        n: 0,
+        title: "Your cube",
+        sub: "You already finished this one — it's a real software renderer.",
+        items: [
+          { id: "cube", name: "ascii-logo-cube — index.html", url: "../index.html",
+            note: "The thing you built: perspective projection, a z-buffer, and texture mapping, all by hand in ~300 lines. Re-read it after each stage and more of it will click.",
+            type: ["code"], level: "beg" }
+        ]
+      },
+      {
+        n: 1,
+        title: "The math behind it",
+        sub: "Build intuition for the matrices and vectors. Watch before you read code.",
+        items: [
+          { id: "3b1b", name: "3Blue1Brown — Essence of Linear Algebra", url: "https://www.3blue1brown.com/topics/linear-algebra",
+            note: "Visual, intuition-first. Explains the rotation matrix and matrix-multiply in your rotate(), and the basis vectors that Gram–Schmidt re-squares.",
+            type: ["vid"], level: "beg" },
+          { id: "freya", name: "Freya Holmér — Math for Game Devs", url: "https://www.youtube.com/playlist?list=PLImQaTpSAdsArRFFj8bIfqMk2X7Vlf3XF",
+            note: "Vectors, dot products, transforms — aimed squarely at this kind of code. Her dot-product video is exactly your back-face cull.",
+            type: ["vid"], level: "beg" },
+          { id: "songho", name: "Song Ho Ahn — songho.ca (math & graphics notes)", url: "https://www.songho.ca/index.html",
+            note: "A legendary reference. Its Math section derives the projection matrix step by step, plus rotation matrices and quaternions — the precise math behind your projection (lines 384–386) and rotate(). Also has full OpenGL & WebGL sections for later stages.",
+            type: ["read"], level: "int" }
+        ]
+      },
+      {
+        n: 2,
+        title: "Software rendering from scratch",
+        sub: "The closest match to your cube — everything implemented in code, no GPU.",
+        items: [
+          { id: "scratch", name: "Scratchapixel", url: "https://www.scratchapixel.com",
+            note: "THE site for this. Builds software renderers from scratch, covering perspective projection, rasterization, the z-buffer and the pinhole camera — exactly your render() loop. If you open one link, open this.",
+            type: ["read", "int"], level: "int" },
+          { id: "donut", name: "a1k0n — Donut math (how donut.c works)", url: "https://www.a1k0n.net/2011/07/20/donut-math.html",
+            note: "The author's writeup of the K1 / K2 / ooz technique your cube descends from. This is your exact rendering algorithm, line by line.",
+            type: ["read"], level: "int" }
+        ]
+      },
+      {
+        n: 3,
+        title: "Onto the GPU (shaders & OpenGL)",
+        sub: "Move the same math onto the graphics card. This unlocks lighting, shadows, and reading real-world projects.",
+        items: [
+          { id: "learnogl", name: "Learn OpenGL", url: "https://learnopengl.com",
+            note: "Modern, polished. 'Coordinate Systems' + 'Transformations' = the model→world→screen pipeline you wrote by hand. Then 'Lighting' introduces what your cube doesn't have yet.",
+            type: ["read", "code"], level: "int" },
+          { id: "ogltut", name: "opengl-tutorial.org — Matrices & Textured Cube", url: "https://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/",
+            note: "Read Tutorial 3 (Matrices) and Tutorial 5 (Textured Cube) — superb on the MVP pipeline and texturing. Skip the GLFW/GLEW setup plumbing; your cube already taught you the concepts.",
+            type: ["read", "code"], level: "int" },
+          { id: "songhowebgl", name: "songho/webgl — WebGL examples & utilities", url: "https://github.com/songho/webgl",
+            note: "The gentlest jump from your cube onto the GPU: JavaScript + GLSL that runs in the browser (no C++ build). 26 examples — cube/sphere geometry, shaders, lighting, texturing, shadow mapping, mouse picking — paired with Song Ho's articles. Read the GLSL shaders to see your render() math done by the GPU.",
+            type: ["code"], level: "int" },
+          { id: "codingtrain", name: "The Coding Train", url: "https://thecodingtrain.com",
+            note: "The most beginner-friendly option, in JavaScript. Good 3D-rotation and perspective episodes if videos suit you better than reading.",
+            type: ["vid"], level: "beg" },
+          { id: "lague", name: "Sebastian Lague — Coding Adventures", url: "https://www.youtube.com/@SebastianLague",
+            note: "Builds graphics things from scratch with gorgeous visuals. Great for seeing how an engineer reasons through a rendering problem.",
+            type: ["vid"], level: "int" }
+        ]
+      },
+      {
+        n: 4,
+        title: "Capstone & inspiration",
+        sub: "Where the path leads. Come back to this once Stage 3 makes the shaders readable.",
+        items: [
+          { id: "solar", name: "GTruf — SolarSystem-3D", url: "https://github.com/GTruf/SolarSystem-3D",
+            note: "An advanced OpenGL 4.6 / C++ solar system: Blinn-Phong lighting, normal maps, soft shadows, atmospheric scattering. Its vertex shaders do what your projection lines do — just on the GPU. Aspirational target, not a starting point.",
+            type: ["code"], level: "adv" }
+        ]
+      }
+    ];
+
+    const ALGOS = [
+      { a: "Perspective projection", l: "384–386", d: "The 1/z divide that makes near things big and far things small.", r: "Scratchapixel", u: "https://www.scratchapixel.com" },
+      { a: "Z-buffering", l: "373, 389–390", d: "Keeps only the nearest surface per cell — hidden-surface removal (Catmull, 1974).", r: "Wikipedia", u: "https://en.wikipedia.org/wiki/Z-buffering" },
+      { a: "Back-face culling", l: "375–376", d: "Skips faces pointing away from the camera using the normal's sign.", r: "Wikipedia", u: "https://en.wikipedia.org/wiki/Back-face_culling" },
+      { a: "Gram–Schmidt", l: "352–361", d: "Re-squares the rotation matrix each frame so float drift can't skew the cube.", r: "Wikipedia", u: "https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process" },
+      { a: "Rotation matrix / trackball", l: "342–351", d: "Orientation as a 3×3 matrix; pre-multiply gives intuitive drag.", r: "3Blue1Brown", u: "https://www.3blue1brown.com/topics/linear-algebra" },
+      { a: "Texture mapping", l: "283–292", d: "Maps a surface point (u,v) to a logo pixel (nearest-neighbour).", r: "Wikipedia", u: "https://en.wikipedia.org/wiki/Texture_mapping" },
+      { a: "Run-length encoding", l: "402–420", d: "Groups same-colour characters into one <span> to keep the HTML small.", r: "Wikipedia", u: "https://en.wikipedia.org/wiki/Run-length_encoding" },
+      { a: "Color quantization", l: "267", d: "Snaps colours to coarse buckets (v & 0xF0) so flat regions form long runs.", r: "Wikipedia", u: "https://en.wikipedia.org/wiki/Color_quantization" },
+      { a: "Euler integration + damping", l: "430–431", d: "Velocity advances the spin, then decays by friction — simulated momentum.", r: "Wikipedia", u: "https://en.wikipedia.org/wiki/Euler_method" },
+      { a: "Bounding-box crop", l: "213–219", d: "Min/max scan to trim the logo down to its ink before sampling.", r: "Wikipedia", u: "https://en.wikipedia.org/wiki/Minimum_bounding_box" }
+    ];
+
+    const REFS = [
+      { n: "MDN — requestAnimationFrame", u: "https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame" },
+      { n: "MDN — Canvas 2D API", u: "https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API" },
+      { n: "MDN — Path2D", u: "https://developer.mozilla.org/en-US/docs/Web/API/Path2D" },
+      { n: "Wikipedia — 3D projection", u: "https://en.wikipedia.org/wiki/3D_projection" },
+      { n: "Wikipedia — Rasterisation", u: "https://en.wikipedia.org/wiki/Rasterisation" },
+      { n: "Wikipedia — Rotation matrix", u: "https://en.wikipedia.org/wiki/Rotation_matrix" },
+      { n: "songho — OpenGL Projection Matrix (derivation)", u: "https://www.songho.ca/opengl/gl_projectionmatrix.html" },
+      { n: "songho — OpenGL Transformation", u: "https://www.songho.ca/opengl/gl_transform.html" },
+      { n: "songho — Quaternions", u: "https://www.songho.ca/math/quaternion/quaternion.html" }
+    ];
+
+    const TYPE_META = {
+      vid:  { cls: "t-vid",  label: "📺 Video" },
+      read: { cls: "t-read", label: "📖 Reading" },
+      int:  { cls: "t-int",  label: "🕹️ Interactive" },
+      code: { cls: "t-code", label: "💻 Code" }
+    };
+    const LVL_META = {
+      beg: { cls: "lvl-beg", label: "Beginner" },
+      int: { cls: "lvl-int", label: "Intermediate" },
+      adv: { cls: "lvl-adv", label: "Advanced" }
+    };
+
+    // ---------------- render ----------------
+    const KEY = "graphics-roadmap-progress";
+    const saved = JSON.parse(localStorage.getItem(KEY) || "{}");
+    const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    const stagesEl = document.getElementById("stages");
+    let allIds = [];
+
+    for (const st of STAGES) {
+      const cards = st.items.map(it => {
+        allIds.push(it.id);
+        const checked = saved[it.id] ? "checked" : "";
+        const tags = it.type.map(t =>
+          `<span class="tag ${TYPE_META[t].cls}">${TYPE_META[t].label}</span>`).join("") +
+          `<span class="tag ${LVL_META[it.level].cls}">${LVL_META[it.level].label}</span>`;
+        return `
+          <div class="card ${checked ? "done" : ""}" data-card="${it.id}">
+            <input type="checkbox" class="chk" data-id="${it.id}" ${checked}>
+            <div class="card-body">
+              <a class="name" href="${it.url}" target="_blank" rel="noopener">${esc(it.name)}</a>
+              <div class="note">${esc(it.note)}</div>
+              <div class="tags">${tags}</div>
+            </div>
+          </div>`;
+      }).join("");
+
+      stagesEl.insertAdjacentHTML("beforeend", `
+        <section class="stage">
+          <div class="stage-head">
+            <div class="stage-num">${st.n}</div>
+            <h2 class="stage-title">${esc(st.title)}</h2>
+          </div>
+          <div class="stage-sub">${esc(st.sub)}</div>
+          <div class="cards">${cards}</div>
+        </section>`);
+    }
+
+    document.getElementById("algoBody").innerHTML = ALGOS.map(x => `
+      <tr>
+        <td class="algo">${esc(x.a)}</td>
+        <td class="lines">${x.l}</td>
+        <td>${esc(x.d)}</td>
+        <td><a href="${x.u}" target="_blank" rel="noopener">${esc(x.r)}</a></td>
+      </tr>`).join("");
+
+    document.getElementById("refs").innerHTML = REFS.map(r =>
+      `<a class="ref" href="${r.u}" target="_blank" rel="noopener">${esc(r.n)}</a>`).join("");
+
+    // ---------------- progress ----------------
+    const barFill = document.getElementById("barFill");
+    const pctNum = document.getElementById("pctNum");
+    const pctCount = document.getElementById("pctCount");
+
+    function updateProgress() {
+      const done = allIds.filter(id => saved[id]).length;
+      const total = allIds.length;
+      const pct = total ? Math.round(done / total * 100) : 0;
+      barFill.style.width = pct + "%";
+      pctNum.textContent = pct + "%";
+      pctCount.textContent = done + " / " + total;
+    }
+
+    document.addEventListener("change", e => {
+      const chk = e.target.closest(".chk");
+      if (!chk) return;
+      const id = chk.dataset.id;
+      if (chk.checked) saved[id] = 1; else delete saved[id];
+      localStorage.setItem(KEY, JSON.stringify(saved));
+      chk.closest(".card").classList.toggle("done", chk.checked);
+      updateProgress();
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      for (const k of Object.keys(saved)) delete saved[k];
+      localStorage.removeItem(KEY);
+      document.querySelectorAll(".chk").forEach(c => c.checked = false);
+      document.querySelectorAll(".card").forEach(c => c.classList.remove("done"));
+      updateProgress();
+    });
+
+    updateProgress();
+  </script>
+</body>
+
+</html>
